@@ -26,8 +26,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
 import com.licomm.papercraft.R;
 import com.licomm.papercraft.core.AppInfo;
 import com.licomm.papercraft.core.AppProxyManager;
@@ -60,12 +58,12 @@ public class MainActivity extends Activity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        scrollViewLog = (ScrollView) findViewById(R.id.scrollViewLog);
-        textViewLog = (TextView) findViewById(R.id.textViewLog);
+        scrollViewLog = findViewById(R.id.scrollViewLog);
+        textViewLog = findViewById(R.id.textViewLog);
         findViewById(R.id.ProxyUrlLayout).setOnClickListener(this);
         findViewById(R.id.AppSelectLayout).setOnClickListener(this);
 
-        textViewProxyUrl = (TextView) findViewById(R.id.textViewProxyUrl);
+        textViewProxyUrl = findViewById(R.id.textViewProxyUrl);
         String ProxyUrl = readProxyUrl();
         if (TextUtils.isEmpty(ProxyUrl)) {
             textViewProxyUrl.setText(R.string.config_not_set_value);
@@ -82,10 +80,10 @@ public class MainActivity extends Activity implements
         //Pre-App Proxy
         if (AppProxyManager.isLollipopOrAbove){
             new AppProxyManager(this);
-            textViewProxyApp = (TextView) findViewById(R.id.textViewAppSelectDetail);
+            textViewProxyApp = findViewById(R.id.textViewAppSelectDetail);
         } else {
             ((ViewGroup) findViewById(R.id.AppSelectLayout).getParent()).removeView(findViewById(R.id.AppSelectLayout));
-            ((ViewGroup) findViewById(R.id.textViewAppSelectLine).getParent()).removeView(findViewById(R.id.textViewAppSelectLine));
+            findViewById(R.id.textViewAppSelectLine).setVisibility(View.GONE);
         }
     }
 
@@ -118,19 +116,7 @@ public class MainActivity extends Activity implements
 
     boolean isValidUrl(String url) {
         try {
-            if (url == null || url.isEmpty())
-                return false;
-
-            if (url.startsWith("ss://")) {//file path
-                return true;
-            } else { //url
-                Uri uri = Uri.parse(url);
-                if (!"http".equals(uri.getScheme()) && !"https".equals(uri.getScheme()))
-                    return false;
-                if (uri.getHost() == null)
-                    return false;
-            }
-            return true;
+            return !(url == null || url.isEmpty()) && url.startsWith("ss://");
         } catch (Exception e) {
             return false;
         }
@@ -143,36 +129,11 @@ public class MainActivity extends Activity implements
         }
 
         if (v.getTag().toString().equals("ProxyUrl")){
-            new AlertDialog.Builder(this)
-                    .setTitle(R.string.config_url)
-                    .setItems(new CharSequence[]{
-                            getString(R.string.config_url_scan),
-                            getString(R.string.config_url_manual)
-                    }, new OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            switch (i) {
-                                case 0:
-                                    scanForProxyUrl();
-                                    break;
-                                case 1:
-                                    showProxyUrlInputDialog();
-                                    break;
-                            }
-                        }
-                    })
-                    .show();
+            showProxyUrlInputDialog();
         } else if (v.getTag().toString().equals("AppSelect")){
             System.out.println("abc");
             startActivity(new Intent(this, AppManager.class));
         }
-    }
-
-    private void scanForProxyUrl() {
-        new IntentIntegrator(this)
-                .setResultDisplayDuration(0)
-                .setPrompt(getString(R.string.config_url_scan_hint))
-                .initiateScan(IntentIntegrator.QR_CODE_TYPES);
     }
 
     private void showProxyUrlInputDialog() {
@@ -283,17 +244,17 @@ public class MainActivity extends Activity implements
             return;
         }
 
-        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
-        if (scanResult != null) {
-            String ProxyUrl = scanResult.getContents();
-            if (isValidUrl(ProxyUrl)) {
-                setProxyUrl(ProxyUrl);
-                textViewProxyUrl.setText(ProxyUrl);
-            } else {
-                Toast.makeText(MainActivity.this, R.string.err_invalid_url, Toast.LENGTH_SHORT).show();
-            }
-            return;
-        }
+//        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+//        if (scanResult != null) {
+//            String ProxyUrl = scanResult.getContents();
+//            if (isValidUrl(ProxyUrl)) {
+//                setProxyUrl(ProxyUrl);
+//                textViewProxyUrl.setText(ProxyUrl);
+//            } else {
+//                Toast.makeText(MainActivity.this, R.string.err_invalid_url, Toast.LENGTH_SHORT).show();
+//            }
+//            return;
+//        }
 
         super.onActivityResult(requestCode, resultCode, intent);
     }

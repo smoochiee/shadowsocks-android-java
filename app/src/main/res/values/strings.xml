@@ -7,9 +7,6 @@
     <string name="menu_item_exit">Exit</string>
     <string name="config_url">Config URL</string>
     <string name="config_not_set_value">Not set</string>
-    <string name="config_url_scan">Scan an QR code</string>
-    <string name="config_url_manual">Type manually</string>
-    <string name="config_url_scan_hint">Scan the QR code of your config url</string>
     <string name="select_app">Select App</string>
     <string name="select_app_detail">No</string>
     <string name="proxied_apps">Per-App Proxy</string>
@@ -18,7 +15,7 @@
     <string name="btn_more">More&#8230;</string>
     <string name="vpn_connected_status">connected</string>
     <string name="vpn_disconnected_status">disconnected</string>
-    <string name="about_info">Papercraft-android is writen by liComm. It is lightweight and saves battery.</string>
+    <string name="about_info">Papercraft-android is written by liComm. It is lightweight and saves battery.</string>
     <string name="exit_confirm_info">This will close the tunnel connection, Are you sure to exit?</string>
     <string name="err_invalid_url">The config URL is invalid.</string>
     <string name="config_url_hint">ss://method:password@host:port</string>
