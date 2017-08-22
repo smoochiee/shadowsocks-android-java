@@ -394,7 +394,7 @@ public class LocalVpnService extends VpnService implements Runnable {
                 writeLog("Proxy All Apps");
             }
             for (AppInfo app : AppProxyManager.Instance.proxyAppInfo){
-                builder.addAllowedApplication("com.vm.shadowsocks");//需要把自己加入代理，不然会无法进行网络连接
+                builder.addAllowedApplication("com.licomm.papercraft");//需要把自己加入代理，不然会无法进行网络连接
                 try{
                     builder.addAllowedApplication(app.getPkgName());
                     writeLog("Proxy App: " + app.getAppLabel());

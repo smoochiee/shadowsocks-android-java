@@ -123,7 +123,7 @@ public class AppManager extends Activity{
                 appInfo.setAppLabel(appLabel);
                 appInfo.setPkgName(pkgName);
                 appInfo.setAppIcon(icon);
-                if (!appInfo.getPkgName().equals("com.vm.shadowsocks"))//App本身会强制加入代理列表
+                if (!appInfo.getPkgName().equals("com.licomm.papercraft"))//App本身会强制加入代理列表
                     AppProxyManager.Instance.mlistAppInfo.add(appInfo);
             }
         }
