@@ -1,6 +1,8 @@
 # shadowsocks-android-java
 
-Last release: [Download](https://github.com/dawei101/shadowsocks-android-java/releases)
+Last release: Still debugging
+
+# Instructions from dawei101
 
 ### 关于 About
 
@@ -31,7 +33,7 @@ ss://base64encode(method:password@host:port)
 
 其中代码保留了SmartProxy对http(s)代理的支持, 使用时将配置链接填写标准http(s)代理格式即可.
 
-And also it inherited the support of http(s) proxy from Smartproxy , Set the url as stardand http(s) proxy format when use it. 
+And also it inherited the support of http(s) proxy from Smartproxy , Set the url as stardand http(s) proxy format when use it.
 
 http(s)代理格式
 
@@ -64,7 +66,7 @@ camellia-256-cfb
 
 Scala version is high threshold to lots of developer, so it's a better choice to choose this version.
 
-### 作者同系列版本 
+### 作者同系列版本
 
 [shadowsocks 桌面版，一份代码完美支持windows，mac osx，linux](https://github.com/dawei101/tongsheClient.shadowsocks-go)
 
@@ -72,5 +74,8 @@ Scala version is high threshold to lots of developer, so it's a better choice to
 
 [Apache License](./LICENSE)
 
+# More Instructions
 
+# This project is in ACTIVE development, so bugs expected.
+# Note: This app is renamed to Papercraft, with codes forked from dawei.
 
