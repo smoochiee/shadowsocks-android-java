@@ -34,14 +34,14 @@ import com.licomm.papercraft.core.ProxyConfig;
 
 import java.util.Calendar;
 
-public class MainActivity extends Activity implements
+public class ConfigActivity extends Activity implements
         View.OnClickListener,
         OnCheckedChangeListener,
         LocalVpnService.onStatusChangedListener {
 
     private static String GL_HISTORY_LOGS;
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = ConfigActivity.class.getSimpleName();
 
     private static final String CONFIG_URL_KEY = "CONFIG_URL_KEY";
 
@@ -56,7 +56,7 @@ public class MainActivity extends Activity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_config);
 
         scrollViewLog = findViewById(R.id.scrollViewLog);
         textViewLog = findViewById(R.id.textViewLog);
@@ -157,7 +157,7 @@ public class MainActivity extends Activity implements
                             setProxyUrl(ProxyUrl);
                             textViewProxyUrl.setText(ProxyUrl);
                         } else {
-                            Toast.makeText(MainActivity.this, R.string.err_invalid_url, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ConfigActivity.this, R.string.err_invalid_url, Toast.LENGTH_SHORT).show();
                         }
                     }
                 })
@@ -251,7 +251,7 @@ public class MainActivity extends Activity implements
 //                setProxyUrl(ProxyUrl);
 //                textViewProxyUrl.setText(ProxyUrl);
 //            } else {
-//                Toast.makeText(MainActivity.this, R.string.err_invalid_url, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(ConfigActivity.this, R.string.err_invalid_url, Toast.LENGTH_SHORT).show();
 //            }
 //            return;
 //        }
@@ -310,7 +310,7 @@ public class MainActivity extends Activity implements
                             public void onClick(DialogInterface dialog, int which) {
                                 LocalVpnService.IsRunning = false;
                                 LocalVpnService.Instance.disconnectVPN();
-                                stopService(new Intent(MainActivity.this, LocalVpnService.class));
+                                stopService(new Intent(ConfigActivity.this, LocalVpnService.class));
                                 System.runFinalization();
                                 System.exit(0);
                             }

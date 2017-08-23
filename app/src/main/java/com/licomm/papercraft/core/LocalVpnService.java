@@ -18,7 +18,7 @@ import com.licomm.papercraft.tcpip.CommonMethods;
 import com.licomm.papercraft.tcpip.IPHeader;
 import com.licomm.papercraft.tcpip.TCPHeader;
 import com.licomm.papercraft.tcpip.UDPHeader;
-import com.licomm.papercraft.ui.MainActivity;
+import com.licomm.papercraft.ui.ConfigActivity;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -170,7 +170,7 @@ public class LocalVpnService extends VpnService implements Runnable {
 
 
             ChinaIpMaskManager.loadFromFile(getResources().openRawResource(R.raw.ipmask));//加载中国的IP段，用于IP分流。
-            waitUntilPreapred();//检查是否准备完毕。
+            waitUntilPrepared();//检查是否准备完毕。
 
             writeLog("Load config from file ...");
             try {
@@ -327,7 +327,7 @@ public class LocalVpnService extends VpnService implements Runnable {
         }
     }
 
-    private void waitUntilPreapred() {
+    private void waitUntilPrepared() {
         while (prepare(this) != null) {
             try {
                 Thread.sleep(100);
@@ -407,7 +407,7 @@ public class LocalVpnService extends VpnService implements Runnable {
             writeLog("No Pre-App proxy, due to low Android version.");
         }
 
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, ConfigActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
         builder.setConfigureIntent(pendingIntent);
 
