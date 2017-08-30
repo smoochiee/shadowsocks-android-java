@@ -3,6 +3,10 @@ package com.licomm.papercraft.ui;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -11,7 +15,6 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,6 +25,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.Spinner;
+import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -92,6 +96,15 @@ public class ConfigActivity extends Activity implements
         mCalendar = Calendar.getInstance();
         LocalVpnService.addOnStatusChangedListener(this);
 
+        final Button button = findViewById(R.id.reset);
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                mEditPort.setText("");
+                mEditPassword.setText("");
+                mEditServer.setText("");
+            }
+        });
+
 
         //Pre-App Proxy
         if (AppProxyManager.isLollipopOrAbove) {
@@ -99,7 +112,14 @@ public class ConfigActivity extends Activity implements
             textViewProxyApp = findViewById(R.id.textViewAppSelectDetail);
         } else {
             ((ViewGroup) findViewById(R.id.AppSelectLayout).getParent()).removeView(findViewById(R.id.AppSelectLayout));
-           // findViewById(R.id.textViewAppSelectLine).setVisibility(View.GONE);
+            // findViewById(R.id.textViewAppSelectLine).setVisibility(View.GONE);
+        }
+
+        if (LocalVpnService.IsRunning) {
+            disableEditText();
+        }
+        else {
+            enableEditText();
         }
     }
 
@@ -178,42 +198,40 @@ public class ConfigActivity extends Activity implements
             return;
         }
 
-        if (v.getTag().toString().equals("ProxyUrl")){
-            showProxyUrlInputDialog();
-        } else if (v.getTag().toString().equals("AppSelect")){
+        if (v.getTag().toString().equals("AppSelect")){
             System.out.println("abc");
             startActivity(new Intent(this, AppManager.class));
         }
     }
 
-    private void showProxyUrlInputDialog() {
-        final EditText editText = new EditText(this);
-        editText.setInputType(InputType.TYPE_TEXT_VARIATION_URI);
-        editText.setHint(getString(R.string.config_url_hint));
-        editText.setText(readProxyUrl());
-
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.config_url)
-                .setView(editText)
-                .setPositiveButton(R.string.btn_ok, new OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (editText.getText() == null) {
-                            return;
-                        }
-
-                        String ProxyUrl = editText.getText().toString().trim();
-                        if (isValidUrl(ProxyUrl)) {
-                            setProxyUrl(ProxyUrl);
-                            //textViewProxyUrl.setText(ProxyUrl);
-                        } else {
-                            Toast.makeText(ConfigActivity.this, R.string.err_invalid_url, Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                })
-                .setNegativeButton(R.string.btn_cancel, null)
-                .show();
-    }
+//    private void showProxyUrlInputDialog() {
+//        final EditText editText = new EditText(this);
+//        editText.setInputType(InputType.TYPE_TEXT_VARIATION_URI);
+//        editText.setHint(getString(R.string.config_url_hint));
+//        editText.setText(readProxyUrl());
+//
+//        new AlertDialog.Builder(this)
+//                .setTitle(R.string.config_url)
+//                .setView(editText)
+//                .setPositiveButton(R.string.btn_ok, new OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        if (editText.getText() == null) {
+//                            return;
+//                        }
+//
+//                        String ProxyUrl = editText.getText().toString().trim();
+//                        if (isValidUrl(ProxyUrl)) {
+//                            setProxyUrl(ProxyUrl);
+//                            //textViewProxyUrl.setText(ProxyUrl);
+//                        } else {
+//                            Toast.makeText(ConfigActivity.this, R.string.err_invalid_url, Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
+//                })
+//                .setNegativeButton(R.string.btn_cancel, null)
+//                .show();
+//    }
 
     @SuppressLint("DefaultLocale")
     @Override
@@ -256,6 +274,8 @@ public class ConfigActivity extends Activity implements
                 }
             } else {
                 LocalVpnService.IsRunning = false;
+                enableEditText();
+                closeNotification();
             }
         }
     }
@@ -286,7 +306,69 @@ public class ConfigActivity extends Activity implements
         GL_HISTORY_LOGS = null;
         onLogReceived("WHEN BAD MEETS EVIL>>>>>.....");
         LocalVpnService.ProxyUrl = ProxyUrl;
+
+        showNotification();
+
+        disableEditText();
+
         startService(new Intent(this, LocalVpnService.class));
+    }
+
+    private void showNotification() {
+        //TODO: Add persist notification
+        Notification.Builder builder = new Notification.Builder(getApplicationContext())
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(getString(R.string.notification_running))
+                .setSubText(getString(R.string.notification_click_enter))
+                .setSmallIcon(R.drawable.vpn_lock)
+                .setOngoing(true)
+                .setPriority(Notification.PRIORITY_DEFAULT);
+        Notification notification = builder.build();
+        NotificationManager notificationManger =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Intent resultIntent = new Intent(this, ConfigActivity.class);
+        PendingIntent resultPendingIntent =
+                PendingIntent.getActivity(
+                        this,
+                        0,
+                        resultIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        builder.setContentIntent(resultPendingIntent);
+        notificationManger.notify(01, notification);
+    }
+
+    private void closeNotification() {
+        NotificationManager notificationManger =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManger.cancel(01);
+    }
+
+    private void disableEditText() {
+        findViewById(R.id.editText1).setEnabled(false);
+        findViewById(R.id.editText2).setEnabled(false);
+        findViewById(R.id.editText3).setEnabled(false);
+        findViewById(R.id.editText1).setFocusable(false);
+        findViewById(R.id.editText2).setFocusable(false);
+        findViewById(R.id.editText3).setFocusable(false);
+        findViewById(R.id.editText1).setFocusableInTouchMode(false);
+        findViewById(R.id.editText2).setFocusableInTouchMode(false);
+        findViewById(R.id.editText3).setFocusableInTouchMode(false);
+        findViewById(R.id.spinner1).setEnabled(false);
+    }
+
+    private void enableEditText() {
+        findViewById(R.id.editText1).setEnabled(true);
+        findViewById(R.id.editText2).setEnabled(true);
+        findViewById(R.id.editText3).setEnabled(true);
+        findViewById(R.id.editText1).setFocusable(true);
+        findViewById(R.id.editText2).setFocusable(true);
+        findViewById(R.id.editText3).setFocusable(true);
+        findViewById(R.id.editText1).setFocusableInTouchMode(true);
+        findViewById(R.id.editText2).setFocusableInTouchMode(true);
+        findViewById(R.id.editText3).setFocusableInTouchMode(true);
+        findViewById(R.id.spinner1).setEnabled(true);
     }
 
     @Override
