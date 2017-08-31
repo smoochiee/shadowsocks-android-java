@@ -11,7 +11,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,11 +24,12 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.Spinner;
-import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.licomm.papercraft.R;
 import com.licomm.papercraft.core.AppInfo;
 import com.licomm.papercraft.core.AppProxyManager;
@@ -42,6 +42,11 @@ public class ConfigActivity extends Activity implements
         View.OnClickListener,
         OnCheckedChangeListener,
         LocalVpnService.onStatusChangedListener {
+
+    FloatingActionMenu materialDesignFAM;
+    FloatingActionButton floatingActionButton1,floatingActionButton2;
+
+
 
 
     private static String GL_HISTORY_LOGS;
@@ -59,6 +64,8 @@ public class ConfigActivity extends Activity implements
     private Calendar mCalendar;
     private Spinner mSpinner;
 
+
+
     private SharedPreferences spf;
     private static final String PREF_NAME = "config";
     private static final String SERVER_NAME = "server_name";
@@ -74,36 +81,47 @@ public class ConfigActivity extends Activity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_config);
 
+        materialDesignFAM = findViewById(R.id.start_floating_menu);
+        floatingActionButton1 =  findViewById(R.id.reset);
+        floatingActionButton2 = findViewById(R.id.about);
+
         scrollViewLog = findViewById(R.id.scrollViewLog);
         textViewLog = findViewById(R.id.textViewLog);
-        //findViewById(R.id.ProxyUrlLayout).setOnClickListener(this);
         findViewById(R.id.AppSelectLayout).setOnClickListener(this);
+
         mSpinner = findViewById(R.id.spinner1);
         mEditServer = findViewById(R.id.editText1);
         mEditPort = findViewById(R.id.editText2);
         mEditPassword = findViewById(R.id.editText3);
-        //textViewProxyUrl = findViewById(R.id.textViewProxyUrl);
-        // String ProxyUrl = readProxyUrl();
-        // if (TextUtils.isEmpty(ProxyUrl)) {
-        //  textViewProxyUrl.setText(R.string.config_not_set_value);
-        //} else {
-        // textViewProxyUrl.setText(ProxyUrl);
-        //   }
-
         textViewLog.setText(GL_HISTORY_LOGS);
         scrollViewLog.fullScroll(ScrollView.FOCUS_DOWN);
-
         mCalendar = Calendar.getInstance();
         LocalVpnService.addOnStatusChangedListener(this);
 
-        final Button button = findViewById(R.id.reset);
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                mEditPort.setText("");
-                mEditPassword.setText("");
-                mEditServer.setText("");
+//added floatingactionbar
+        floatingActionButton1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(ConfigActivity.this, "reset",Toast.LENGTH_SHORT).show();
+                mEditPort.setText(null);
+                mEditPassword.setText(null);
+                mEditServer.setText(null);
+            }
+
+        });
+//added floating action bar
+        floatingActionButton2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(ConfigActivity.this, "shadowsocks java made by liconm and smoochie", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/smoochiee")));
+
             }
         });
+
+
+
+
 
 
         //Pre-App Proxy
@@ -117,27 +135,27 @@ public class ConfigActivity extends Activity implements
 
         if (LocalVpnService.IsRunning) {
             disableEditText();
-        }
-        else {
+        } else {
             enableEditText();
         }
     }
 
+
     void initConfig() {
         spf = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        String name = spf.getString(SERVER_NAME, "");
-        String port = spf.getString(REMOTE_PORT, "");
-        String password = spf.getString(PASSWORD, "");
+        String name = spf.getString(SERVER_NAME, null);
+        String port = spf.getString(REMOTE_PORT, null);
+        String password = spf.getString(PASSWORD, null);
         String[] methods = getResources().getStringArray(R.array.encrypt);
         int methodId = spf.getInt(ENCRYPT_METHOD, 0);
 
-        if (!name.isEmpty()) {
+        if (name == null) {
             mEditServer.setText(name);
         }
-        if (!port.isEmpty()) {
+        if (port == null) {
             mEditPort.setText(port);
         }
-        if (!password.isEmpty()) {
+        if (password == null) {
             mEditPassword.setText(password);
         }
         if (methodId > -1) {
@@ -146,17 +164,17 @@ public class ConfigActivity extends Activity implements
         }
     }
 
-    String readProxyUrl() {
-        SharedPreferences preferences = getSharedPreferences("shadowsocksProxyUrl", MODE_PRIVATE);
-        return preferences.getString(CONFIG_URL_KEY, "");
-    }
+    //String p() {
+       // SharedPreferences preferences = getSharedPreferences("shadowsocksProxyUrl", MODE_PRIVATE);
+       // return preferences.getString(CONFIG_URL_KEY, "");
+  //  }
 
-    void setProxyUrl(String ProxyUrl) {
-        SharedPreferences preferences = getSharedPreferences("shadowsocksProxyUrl", MODE_PRIVATE);
-        Editor editor = preferences.edit();
-        editor.putString(CONFIG_URL_KEY, ProxyUrl);
-        editor.apply();
-    }
+ //   void setProxyUrl(String ProxyUrl) {
+ //       SharedPreferences preferences = getSharedPreferences("shadowsocksProxyUrl", MODE_PRIVATE);
+    //    Editor editor = preferences.edit();
+      //  editor.putString(CONFIG_URL_KEY, ProxyUrl);
+       // editor.apply();
+  //  }
 
     String getVersionName() {
         PackageManager packageManager = getPackageManager();
