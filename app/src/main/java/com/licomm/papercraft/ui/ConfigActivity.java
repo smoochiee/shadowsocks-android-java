@@ -102,13 +102,16 @@ public class ConfigActivity extends Activity implements
         floatingActionButton1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(ConfigActivity.this, "reset",Toast.LENGTH_SHORT).show();
+                spf = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+                spf.edit().putString(SERVER_NAME,"").apply();
+                spf.edit().putString(REMOTE_PORT, "").apply();
+                spf.edit().putString(PASSWORD, "").apply();
+
+                mEditServer.setText(null);
                 mEditPort.setText(null);
                 mEditPassword.setText(null);
-                mEditServer.setText(null);
             }
-
-        });
+            });
 //added floating action bar
         floatingActionButton2.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,24 +145,26 @@ public class ConfigActivity extends Activity implements
 
 
     void initConfig() {
-        spf = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        String name = spf.getString(SERVER_NAME, null);
-        String port = spf.getString(REMOTE_PORT, null);
-        String password = spf.getString(PASSWORD, null);
+         spf = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        String name = spf.getString(SERVER_NAME, "");
+        String port = spf.getString(REMOTE_PORT, "");
+        String password = spf.getString(PASSWORD, "");
         String[] methods = getResources().getStringArray(R.array.encrypt);
         int methodId = spf.getInt(ENCRYPT_METHOD, 0);
 
-        if (name == null) {
-            mEditServer.setText(name);
-        }
-        if (port == null) {
-            mEditPort.setText(port);
-        }
-        if (password == null) {
-            mEditPassword.setText(password);
-        }
-        if (methodId > -1) {
-            mSpinner.setSelection(methodId);
+
+          if (!name.isEmpty()) {
+              mEditServer.setText(name);
+          }
+          if (!port.isEmpty()) {
+              mEditPort.setText(port);
+          }
+          if (!password.isEmpty()) {
+              mEditPassword.setText(password);
+          }
+          if (methodId > -1) {
+              mSpinner.setSelection(methodId);
+
 
         }
     }
