@@ -8,11 +8,9 @@ import com.licomm.papercraft.tunnel.Config;
 import com.licomm.papercraft.tunnel.httpconnect.HttpConnectConfig;
 import com.licomm.papercraft.tunnel.shadowsocks.ShadowsocksConfig;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -235,18 +233,20 @@ public class ProxyConfig {
 
     private String[] downloadConfig(String url) throws Exception {
         try {
-            HttpClient client = new DefaultHttpClient();
-            HttpGet requestGet = new HttpGet(url);
+            OkHttpClient client = new OkHttpClient();
+            Request request = new Request.Builder()
+                    .url(url)
+                    .addHeader("X-Android-MODEL", Build.MODEL)
+                    .addHeader("X-Android-SDK_INT", Integer.toString(Build.VERSION.SDK_INT))
+                    .addHeader("X-Android-RELEASE", Build.VERSION.RELEASE)
+                    .addHeader("X-App-Version", AppVersion)
+                    .addHeader("X-App-Install-ID", AppInstallID)
+                    .header("User-Agent", System.getProperty("http.agent"))
+                    .build();
 
-            requestGet.addHeader("X-Android-MODEL", Build.MODEL);
-            requestGet.addHeader("X-Android-SDK_INT", Integer.toString(Build.VERSION.SDK_INT));
-            requestGet.addHeader("X-Android-RELEASE", Build.VERSION.RELEASE);
-            requestGet.addHeader("X-App-Version", AppVersion);
-            requestGet.addHeader("X-App-Install-ID", AppInstallID);
-            requestGet.setHeader("User-Agent", System.getProperty("http.agent"));
-            HttpResponse response = client.execute(requestGet);
+            Response response = client.newCall(request).execute();
 
-            String configString = EntityUtils.toString(response.getEntity(), "UTF-8");
+            String configString = response.body().string();
             String[] lines = configString.split("\\n");
             return lines;
         } catch (Exception e) {
