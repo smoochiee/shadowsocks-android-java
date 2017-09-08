@@ -51,6 +51,7 @@ dependencies {
 //    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:design:26.0.1'
+    compile 'com.squareup.okhttp:okhttp:2.7.5'
     compile 'com.github.clans:fab:1.6.4'
 //    testCompile 'junit:junit:4.12'
 //    compile 'com.embarkmobile:zxing-android-minimal:2.0.0@aar'
